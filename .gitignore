@@ -1,0 +1,5 @@
+scratch
+binary
+*.ovl
+EBOOT.BIN
+*.AppImage
