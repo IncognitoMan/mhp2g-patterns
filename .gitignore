@@ -1,5 +1,6 @@
 scratch
 binary
+quests
 *.ovl
 EBOOT.BIN
 *.AppImage

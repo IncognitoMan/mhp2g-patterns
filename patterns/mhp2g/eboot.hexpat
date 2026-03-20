@@ -29,8 +29,7 @@ struct EquipCraftItem {
   u16 Quantity;
 }[[name(std::format("{} ({})", ItemID[Item], Quantity))]];
 
-struct EquipCreate <auto type> {
-  u32 EquipType = type;
+struct EquipCreate <auto EquipType> {
   EquipTypeID Type;
   u8 Hide;
   u16 EquipID;
@@ -81,8 +80,7 @@ struct EquipmentCreateTable {
 
 // Equip Upgrade
 
-struct EquipUpgrade <auto type> {
-  u32 EquipType = type;
+struct EquipUpgrade <auto EquipType> {
   EquipCraftItem Craft[4][[name("Crafting Items")]];
   u16 Upgrade1 [[name(
     EquipType == 0 ? WepBMID[this] :
@@ -170,8 +168,7 @@ struct ArmorRes {
   s8 IceRes;
 } [[name("Elemental Resistances")]];
 
-struct ArmorValue <auto type> {
-  u32 ArmorType = type;
+struct ArmorValue <auto ArmorType> {
   u16 MaleID;
   u16 FemaleID;
   u8 HunterType;
@@ -196,17 +193,11 @@ struct ArmorValue <auto type> {
 )]];
 
 struct ArmorValuePTR {
-  u32 LegValPTR [[hidden]];
-  u32 HeadValPTR [[hidden]];
-  u32 ChestValPTR [[hidden]];
-  u32 ArmValPTR [[hidden]];
-  u32 WaistValPTR [[hidden]];
-
-  ArmorValue<1> HeadArmorValues[436] @ HeadValPTR[[name("Head Armor Values")]];
-  ArmorValue<2> ChestArmorValues[420] @ ChestValPTR[[name("Chest Armor Values")]];
-  ArmorValue<3> ArmArmorValues[411] @ ArmValPTR[[name("Arm Armor Values")]];
-  ArmorValue<4> WaistArmorValues[409] @ WaistValPTR[[name("Waist Armor Values")]];
-  ArmorValue<0> LegArmorValues[420] @ LegValPTR[[name("Leg Armor Values")]];
+  ArmorValue<1> *HeadArmorValues[436] : u32 [[name("Head Armor Values")]];
+  ArmorValue<2> *ChestArmorValues[420] : u32 [[name("Chest Armor Values")]];
+  ArmorValue<3> *ArmArmorValues[411] : u32 [[name("Arm Armor Values")]];
+  ArmorValue<4> *WaistArmorValues[409] : u32 [[name("Waist Armor Values")]];
+  ArmorValue<0> *LegArmorValues[420] : u32 [[name("Leg Armor Values")]];
 };
 
 // --------------------------------------------------------------------------------------
@@ -272,7 +263,7 @@ struct WepValueDualAttr {
 }[[name(WepBMID[WeaponID])]];
 
 // Sharpness table entries
-struct WeaponSharpness{
+struct WeaponSharpness {
   u16  Red[[name(std::format("Red {} ({})", this, this))]];
   u16  Orange[[name(std::format("Orange {} ({})", this - Red, this))]];
   u16  Yellow[[name(std::format("Yellow {} ({})", this - Orange, this))]];
@@ -298,18 +289,13 @@ struct BGModLevel {
 };
 
 struct BGModTable {
-  u32 PTR1[[hidden]];
-  u32 PTR2[[hidden]];
-  u32 PTR3[[hidden]];
-  u32 PTR4[[hidden]];
-
-  BGModLevel ModLevel1[5] @ PTR1;
-  BGModLevel ModLevel2[5] @ PTR2;
-  BGModLevel ModLevel3[5] @ PTR3;
-  BGModLevel ModLevel4[5] @ PTR4;
+  BGModLevel *ModType1[5] : u32 [[name("Mod Type 1")]];
+  BGModLevel *ModType2[5] : u32 [[name("Mod Type 2")]];
+  BGModLevel *ModType3[5] : u32 [[name("Mod Type 3")]];
+  BGModLevel *ModType4[5] : u32 [[name("Mod Type 4")]];
 };
 
-struct BowCharges{
+struct BowCharges {
   u8 ChargeLv1[[name(BowChargeID[this])]];
   u8 ChargeLv2[[name(BowChargeID[this])]];
   u8 ChargeLv3[[name(BowChargeID[this])]];
@@ -353,7 +339,7 @@ struct BowgunShots {
 };
 
 // Weapon class modifiers
-struct WepClassMod{
+struct WepClassMod {
   u32 GreatSword[[name("Great Sword")]];
   u32 HeavyBowgun[[name("Heavy Bowgun")]];
   u32 Hammer;
@@ -414,7 +400,7 @@ struct WepGunValue {
 
 // Decoration Values
 
-struct DecoValues{    // Actually part of the items table but they throw some deco data in...
+struct DecoValues {    // Actually part of the items table but they throw some deco data in...
   u16 Unkn1;
   u8  Rarity;
   u8  StackLimit;
@@ -435,7 +421,7 @@ struct DecoSkillEntry {
   s8 Amount;
 }[[name(std::format("{} ({})", SkillID[Skill], Amount))]]; 
 
-struct DecoSkill{
+struct DecoSkill {
   u8  ReqSlots;
   u8  Unkn1;   // Always seems to be 0x0F
   u16 Unkn2;
