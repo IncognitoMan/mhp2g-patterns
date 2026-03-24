@@ -6,20 +6,9 @@
 #include <mhp2g/stages.enum>
 #include <mhp2g/monster.enum>
 
-#pragma description MHP2G - Quest Parser (*.mib) v2
+#pragma magic [ 4C 00 00 00 32 4E 44 47 ] @ 0x00
+#pragma description MHP2G - Quest Parser (*.mib)
 #pragma author IncognitoMan
-
-// --------------------------------------------------------------------------------------
-
-// enums
-
-str nodeID[5] = {
-  "Gathering",
-  "",
-  "",
-  "Mining",
-  "Insect"
-};
 
 // --------------------------------------------------------------------------------------
 
@@ -30,7 +19,7 @@ struct questHeader {
   char Magic[4];
   u32  SuppliesPTR[[name("Supplies PTR")]];
   u32  RewardsPTR[[name("Rewards PTR")]];
-  u32  QuestScript[[name("Quest Script PTR")]];
+  u32  QuestScriptPTR[[name("Quest Script PTR")]];
   u32  LargeMonPTR[[name("Large Monster PTR")]];
   u32  SmallMonPTR[[name("Small Monster PTR")]];
   u32  GatheringLocTblPTR[[name("Gathering Node Location Table PTR")]];
@@ -74,8 +63,6 @@ struct questHeader {
   u32  ArenaPTR;
 };
 
-questHeader Header @ 0x00;
-
 // --------------------------------------------------------------------------------------
 
 // Supplies
@@ -84,8 +71,6 @@ struct SupplyItem {
   u16 Item[[name(ItemID[this])]];
   u16 Amount;
 }[[name(std::format("{} ({})", ItemID[Item], Amount))]];
-
-SupplyItem Supplies[while(std::mem::read_unsigned($,1) !=0x00)] @ Header.SuppliesPTR;
 
 // --------------------------------------------------------------------------------------
 
@@ -105,13 +90,24 @@ struct RewardTBL {
   RewardItem Item[while(std::mem::read_unsigned($,2) !=0xFFFF)] @ RewardItemsPTR;
 };
 
-RewardTBL Rewards[while(std::mem::read_unsigned($,2) !=0xFFFF)] @ Header.RewardsPTR;
-
 // --------------------------------------------------------------------------------------
 
 // Script
 
 // TBD, need to figure out the opcodes and arguments fully...
+
+struct QuestPacket {
+  s16 opcode;
+  s16 arg1;
+  s16 arg2;
+  s16 arg3;
+}[[name
+  (opcode == 27 ? "Start Timer" :
+  (opcode == 30 ? "Finish Quest (Victory)" :
+  (opcode == 31 ? "Finish Quest (Failure)" :
+  (opcode == 37 ? "Display Time Over" :
+  ("Unknown")))))
+]];
 
 // --------------------------------------------------------------------------------------
 
@@ -181,12 +177,17 @@ struct SmallMonIndex {
   SmallMonTable SmList[while(std::mem::read_unsigned($,4) !=0x0)] @ SmallMonTablePTR[[name("Small Monster Table")]];
 };
 
-LargeMonTable LargeMons[while(std::mem::read_unsigned($,1) !=0x00)] @ Header.LargeMonPTR [[name("Large Monsters")]];
-SmallMonIndex SmallMons[while(std::mem::read_unsigned($,1) !=0x00)] @ Header.SmallMonPTR [[name("Small Monsters")]];
-
 // --------------------------------------------------------------------------------------
 
 // Gathering Location/Items
+
+str nodeID[5] = {
+  "Gathering",
+  "",
+  "",
+  "Mining",
+  "Insect"
+};
 
 struct GatherNodeItem {
   u16 Value;
@@ -213,11 +214,8 @@ struct GatherNodeData {
 struct GatherNodeLocTbl {
   u32 GatherNodeListPTR[[name("Node List PTR")]];
   
-  GatherNodeData Node[while(std::mem::read_unsigned($,4) !=0xBF800000)] @ GatherNodeListPTR;
+  GatherNodeData Node[while(std::mem::read_unsigned($,4) !=0xBF800000 && GatherNodeListPTR!=0)] @ GatherNodeListPTR;
 };
-
-GatherNodeLocTbl GatherNodes[while(std::mem::read_unsigned($,2) >0x64)] @ Header.GatheringLocTblPTR+4 [[name("Gathering Node Locations")]]; // We skip the first 0x4 since its empty
-GatherNodeItemTbl GatherItems[while(std::mem::read_unsigned($,4) <0x30000000)]  @ Header.GatheringItemsPTR [[name("Gathering Node Items")]]; // we set <0x30000000 because theres no way to ID a terminator and the next section at the end would be a float from node data
 
 // --------------------------------------------------------------------------------------
 
@@ -237,8 +235,6 @@ struct UnknPTR2Tbl {
 
   UnknPTR2Entry Entries[NumOfEntries] @ PTR;
 }[[name(StageID >= 1 && StageID <= 267 ? stageID[StageID] : "Invalid Stage")]];
-
-UnknPTR2Tbl UnknPTR2[while(std::mem::read_signed($,2) !=-1)] @ Header.UnknPTR2 [[name("Unknown PTR 2")]];
 
 // --------------------------------------------------------------------------------------
 
@@ -283,8 +279,6 @@ struct LangPTRs {
   StringPTRs Eng3 @ Eng3PTR[[name("English (3)")]];
 };
 
-LangPTRs Strings @ Header.StringPTRTbl [[name("Quest Strings")]];
-
 // --------------------------------------------------------------------------------------
 
 // Arena Sets
@@ -324,4 +318,61 @@ struct ArenaSet {
   ArenaItem ArenaItems[20][[name("Item Set")]];
 };
 
-ArenaSet ArenaSets[5] @ Header.ArenaPTR [[name("Arena Sets")]];
+// --------------------------------------------------------------------------------------
+
+questHeader Header @ 0x00;
+
+SupplyItem Supplies[while(std::mem::read_unsigned($,2) !=0x00)] @ Header.SuppliesPTR;
+RewardTBL Rewards[while(std::mem::read_unsigned($,2) !=0xFFFF)] @ Header.RewardsPTR;
+
+QuestPacket QuestScript[(Header.SuppliesPTR - Header.QuestScriptPTR) / 8] @ Header.QuestScriptPTR;
+
+LargeMonTable LargeMons[while(std::mem::read_unsigned($,2) !=0x00)] @ Header.LargeMonPTR [[name("Large Monsters")]];
+SmallMonIndex SmallMons[while(std::mem::read_unsigned($,2) !=0x00)] @ Header.SmallMonPTR [[name("Small Monsters")]];
+
+GatherNodeLocTbl GatherNodes[
+  (Header.Map == 1 ? 7 : // Fortress
+  (Header.Map == 2 ? 13 : // Forest and Hills (D)
+  (Header.Map == 3 ? 12 : // Desert (D)
+  (Header.Map == 4 ? 11 : // Swamp (D)
+  (Header.Map == 5 ? 12 : // Volcano (D)
+  (Header.Map == 6 ? 11 : // Jungle (D)
+  (Header.Map == 7 ? 2 : // Castle Schrade
+  (Header.Map == 8 ? 2 : // Battleground
+  (Header.Map == 9 ? 2 : // Arena (Large)
+  (Header.Map == 10 ? 0 : // Arena (Small)
+  (Header.Map == 11 ? 10 : // Snowy Mountain (D)
+  (Header.Map == 12 ? 4 : // Town
+  (Header.Map == 13 ? 2 : // Tower 3
+  (Header.Map == 14 ? 8 : // Tower 2
+  (Header.Map == 15 ? 11 : // Tower 1
+  (Header.Map == 16 ? 13 : // Forest and Hills (N)
+  (Header.Map == 17 ? 12 : // Desert (N)
+  (Header.Map == 18 ? 11 : // Swamp (N)
+  (Header.Map == 19 ? 12 : // Volcano (N)
+  (Header.Map == 20 ? 11 : // Jungle (N)
+  (Header.Map == 21 ? 10 : // Snowy Mountain (N)
+  (Header.Map == 22 ? 2 : // Moat Arena
+  (Header.Map == 23 ? 2 : // Snowy Mountains Peak
+  (Header.Map == 26 ? 11 : // Old Jungle
+  (Header.Map == 27 ? 13 : // Old Desert
+  (Header.Map == 28 ? 13 : // Old Swamp
+  (Header.Map == 29 ? 10 : // Old Volcano
+  (Header.Map == 30 ? 10 : // Great Forest (D)
+  (Header.Map == 31 ? 10 : // Great Forest (N)
+  (0))))))))))))))))))))))))))))))
+] @ Header.GatheringLocTblPTR [[name("Gathering Node Locations")]];
+
+GatherNodeItemTbl GatherItems[
+  while(
+    std::mem::read_unsigned($,4) <0x30000000 && 
+    std::mem::read_unsigned($,4) !=0
+  )
+]  @ Header.GatheringItemsPTR [[name("Gathering Node Items")]];
+
+UnknPTR2Tbl UnknPTR2[while(std::mem::read_signed($,2) !=-1)] @ Header.UnknPTR2 [[name("Unknown PTR 2")]];
+
+LangPTRs Strings @ Header.StringPTRTbl [[name("Quest Strings")]];
+
+ArenaSet ArenaSets[(Header.ArenaPTR!=0)*5] @ Header.ArenaPTR[[name("Arena Sets")]];
+
