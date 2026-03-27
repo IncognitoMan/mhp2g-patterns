@@ -5,6 +5,7 @@
 #include <mhp2g/stages.enum>
 #include <mhp2g/items.enum>
 
+#pragma magic [ 67 61 6D 65 5F 74 61 73  6B 2E 6F 76 6C ] @ 0x20
 #pragma description MHP2G - game_task.ovl
 #pragma author IncognitoMan
 
@@ -19,7 +20,7 @@ struct HitZoneVal{
   u8 Bash;
   u8 Shot;
   u8 Fire;
-  u8 Watar;
+  u8 Water;
   u8 Ice;
   u8 Thunder;
   u8 Dragon;

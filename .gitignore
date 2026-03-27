@@ -4,3 +4,5 @@ quests
 *.ovl
 EBOOT.BIN
 *.AppImage
+*.zip
+ghidra
