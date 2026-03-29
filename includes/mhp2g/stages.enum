@@ -267,3 +267,38 @@ str stageID[267] = {
   "Great Forest (N) (Area8)",
   "Great Forest (N) (Secret)"
 };
+
+str areaID[32] = {
+  "None",
+  "Fortress",
+  "Forest and Hills (D)",
+  "Desert (D)",
+  "Swamp (D)",
+  "Volcano (D)",
+  "Jungle (D)",
+  "Castle Schrade",
+  "Battleground",
+  "Arena (Large)",
+  "Arena (Small)",
+  "Snowy Mountain (D)",
+  "Town",
+  "Tower 3",
+  "Tower 2",
+  "Tower 1",
+  "Forest and Hills (N)",
+  "Desert (N)",
+  "Swamp (N)",
+  "Volcano (N)",
+  "Jungle (N)",
+  "Snowy Mountain (N)",
+  "Moat Arena",
+  "Snowy Mountains Peak",
+  "Invalid 24",
+  "Invalid 25",
+  "Old Jungle",
+  "Old Desert",
+  "Old Swamp",
+  "Old Volcano",
+  "Great Forest (D)",
+  "Great Forest (N)"
+};
