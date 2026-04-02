@@ -77,41 +77,6 @@ struct NavWayType1 {
   NavWayVec3 *NavPoints[NumPoints] : u32;
 }[[name(stageID[AreaID])]];
 
-// struct NavwayEntry {
-//   NavwayT1 *Test[
-//     while(
-//       std::mem::read_signed($, 2) !=-1
-//     )
-//   ] : u32;
-// };
-
-// struct NavWay6 {
-//   u32 Test1;
-//   u32 Test2;
-//   u32 Test3;
-//   u32 Test4;
-//   u32 Test5;
-//   u32 Test6;
-// };
-
-// struct NavWay7 {
-//   u32 Test1;
-//   u32 Test2;
-//   u32 Test3;
-//   u32 Test4;
-//   u32 Test5;
-//   u32 Test6;
-//   u32 Test7;
-// };
-
-// struct NavWayEntry {
-//   if (parent.size == 6) {
-//     NavWay6 *ptr : u32 @ parent.NavWayIPTR[std::core::array_index()]; 
-//   } else if (parent.size == 7) {
-//     NavWay7 *ptr : u32 @ parent.NavWayIPTR[std::core::array_index()]; 
-//   }
-// };
-
 struct NavWayTbl {
   NavWayType1 *PTR1[
     while(
@@ -217,14 +182,6 @@ struct emPTRChunk {
     } else { 
       //
     }
-  // NavWayEntry NavWayTable[size];
-  
-  // NavwayTbl *NavWayPTR[
-  //   while(
-  //     std::mem::read_unsigned($, 4) > 0x09A5A580 &&
-  //     std::mem::read_unsigned($, 4) < 0x09C0C180 
-  //   )
-  // ] : u32;
   u32   UnknPTR1;
 
   u32   UnknPTR2;
@@ -308,15 +265,228 @@ struct emChunk {
   emPTRChunk emPTRTable;
   u64   TERM;
 
-  // HitzoneTbl HitzoneTblE[while(std::mem::read_unsigned($,4) < 0x09EEE000)] @ HitzonePTR;
-  // HitzoneTbl HitzoneTable[
-  //   while(
-  //     std::mem::read_unsigned($, 4) > 0x09A5A580 &&
-  //     std::mem::read_unsigned($, 4) < 0x09C0C180
-  //   )
-  // ] @ HitzonePTR[[name("Hitzone Table")]];
-
 }[[name(emID[std::core::array_index()])]];
 
+// --------------------------------------------------------------------------------------
+
+// Veggie Elder Traders
+
+struct VeggieTrade {
+  u16 Item;
+  u16 CommonT[[name("Common Trade")]];
+  u16 RareT[[name("Rare Trade")]];
+}[[name(std::format("{} || Common: {}  Rare: {}", ItemID[Item], ItemID[CommonT], ItemID[RareT]))]];
+
+struct VeggieTradeTable {
+  VeggieTrade TableA[109][[name("Table A")]];
+  padding[2];
+  VeggieTrade TableB[109][[name("Table B")]];
+  padding[2];
+  VeggieTrade TableC[109][[name("Table C")]];
+  padding[2];
+  VeggieTrade TableD[109][[name("Table D")]];
+  padding[2];
+  VeggieTrade TableE[109][[name("Table E")]];
+  padding[2];
+  VeggieTrade TableF[109][[name("Table F")]];
+  padding[2];
+  VeggieTrade TableG[109][[name("Table G")]];
+};
+
+// --------------------------------------------------------------------------------------
+
+// Melee Hitboxes
+
+str PLMHitboxStr[20] = {
+  "GS/LS",  // Center/Lower/Tip
+  "GS Kick",
+  "Kick",
+  "Hammer",
+  "Hunting Horn (Super Pound)",
+  "Lance",
+  "SnS Sword",
+  "SnS Shield",
+  "Bowgun Melee",
+  "Dual Blades (1)",
+  "Dual Blades (2)",
+  "Unknown",
+  "Bow Melee",
+  "Unknown",
+  "GunLance",
+  "Unknown",
+  "Hunting Horn",
+  "Hunting Horn Poke",
+  "Shadowbox (1)",
+  "Shadowbox (2)"
+};
+
+
+struct PLMHitboxDim{
+  u32 ModifierType;
+  u32 unkn;
+  float Size;
+};
+
+struct PLMHitbox{
+  u16 BoneID;
+  u16 Type;
+  PLMHitboxDim HitboxDimension[3][[name("Dimensions/Size")]];
+};
+
+struct PLMHitboxTable {
+  u32 PTR[[hidden]];
+
+  PLMHitbox PLMeleeHitbox[while(std::mem::read_signed($,4) !=-1)] @ PTR [[name("Hitbox")]];
+}[[name(PLMHitboxStr[std::core::array_index()])]];
+
+// --------------------------------------------------------------------------------------
+
+// Melee Motion Values
+
+str PLMMotValStr[109] = {
+  "Empty",
+  "Great Sword (Upswing)",
+  "Great Sword (Side Slash)",
+  "Great Sword (Draw Slash)",
+  "Great Sword (Kick)",
+  "Player (Kick)",
+  "Hammer (Side Smack)",
+  "Hammer (Combo 1)",
+  "Hammer (Charge 1)",
+  "Hammer (Charge 2)",
+  "Hammer (Charge 3 Swipe)",
+  "Hammer (Charge 3 Pound)",
+  "Hammer (Spin Start)",
+  "Hammer (Spin 1)",
+  "Hammer (Spin Subsequent)",
+  "Hammer (Spin Final)",
+  "Lance (Horizontal Poke)",
+  "Lance (Charge)",
+  "Lance (Guard Poke)",
+  "Unknown",
+  "Lance (Unsheath Poke)",
+  "Sword and Shield (Slash Combo 1)",
+  "Sword and Shield (Jumping Slash)",
+  "Sword and Shield (Revolving Slash)",
+  "Sword and Shield (Guard Slash)",
+  "Sword and Shield (Slash Combo 2)",
+  "Sword and Shield (Slash Combo 3 - 1)",
+  "Sword and Shield (Slash Combo 3 - 2)",
+  "Lance (Diagonal Poke)",
+  "Bowgun (Melee)",
+  "Sword and Shield (Rising Slash After Roll/Jump)",
+  "Lance (Charge Finisher)",
+  "Hammer (Golf Swing)",
+  "Hammer (Combo 2)",
+  "Hammer (Unsheath)",
+  "Lance (Diagonal Poke Final)",
+  "Lance (Horizontal Poke Final)",
+  "Dual Blades (Normal Mode Combo 1)",
+  "Dual Blades (Normal Mode Combo 2 - 1)",
+  "Dual Blades (Normal Mode Combo 2 - 2)",
+  "Dual Blades (Normal Mode Combo 3 - 1)",
+  "Dual Blades (Normal Mode Combo 3 - 2)",
+  "Dual Blades (Normal Mode Combo 3 - 3)",
+  "Unknown",
+  "Dual Blades (Normal Mode Upslash)",
+  "Dual Blades (Normal Mode Circle Slice 1)",
+  "Dual Blades (Normal Mode Circle Slice 2)",
+  "Dual Blades (Normal Mode Circle Slice 3)",
+  "Dual Blades (Demon Dance 1)",
+  "Dual Blades (Demon Dance 2)",
+  "Dual Blades (Demon Dance 3)",
+  "Unknown",
+  "Dual Blades (Demon Mode Circle Slice 1)",
+  "Dual Blades (Demon Mode Circle Slice 2)",
+  "Dual Blades (Demon Mode Circle Slice 3)",
+  "Unknown",
+  "Unknown",
+  "Long Sword (Draw Slash)",
+  "Long Sword (Draw Slash Alt)",
+  "Long Sword (Fade Slash)",
+  "Bow (Melee 1)",
+  "Bow (Melee 2)",
+  "Unknown",
+  "GunLance (Horizontal Poke)",
+  "GunLance (Rising Poke)",
+  "Unknown",
+  "GunLance (Horizontal Poke Finisher)",
+  "GunLance (Guard Poke)",
+  "Unknown",
+  "Long Sword (Spirit Combo 1)",
+  "GunLance (Unsheath)",
+  "Long Sword (Spirit Combo Stab)",
+  "Long Sword (Stab)",
+  "Long Sword (Spirit Combo 2)",
+  "Long Sword (Spirit Combo Upward Slice)",
+  "Long Sword (Upward Slice)",
+  "Long Sword (Spirit Combo 3)",
+  "Long Sword (Spirit Combo 4)",
+  "Unknown",
+  "Long Sword (No Spirit Combo)",
+  "Long Sword (Spirit Combo 5)",
+  "Hunting Horn (Left Swing)",
+  "Hunting Horn (Right Swing)",
+  "Hunting Horn (Initial Poke)",
+  "Hunting Horn (Subsequent Poke)",
+  "Hunting Horn (Super Pound 1)",
+  "Hunting Horn (Super Pound 2)",
+  "Hunting Horn (Forward Slam)",
+  "Hunting Horn (Side Sweep Right)",
+  "Hunting Horn (Side Sweep Left)",
+  "Hunting Horn (Back Slam)",
+  "Great Sword (Charge Level 1)",
+  "Great Sword (Charge Level 2)",
+  "Great Sword (Charge Level 3)",
+  "Hunting Horn (Recital Begin)",
+  "Hunting Horn (Recital End)",
+  "Player (Shadowbox 1)",
+  "Player (Shadowbox 2)",
+  "Unknown",
+  "Unknown",
+  "Sword and Shield (Rising Slash Block)",
+  "Dual Blades (Normal Mode Charging Slice 1 - 1)",
+  "Dual Blades (Normal Mode Charging Slice 1 - 2)",
+  "Dual Blades (Demon Mode Charging Slice 1 - 1)",
+  "Dual Blades (Demon Mode Charging Slice 1 - 2)",
+  "Dual Blades (Charging Slice 2 - 1)",
+  "Dual Blades (Charging Slice 2 - 2)",
+  "Dual Blades (Demon Dance Finisher 1)",
+  "Dual Blades (Demon Dance Finisher 2)"
+};
+
+struct PlayerMotVal {
+  u8 HitboxDelay;
+  u8 HitboxDuration;
+  u8 MotionValue;
+  u8 KnockbackStrength;
+  u8 Unkn1;
+  u8 Unkn2;
+  u8 HitDirection;
+  u8 Unkn3;
+  u8 Unkn4;
+  u8 DamageType;
+  u8 Unkn5;
+  u8 Unkn6;
+  u8 EffectonHit1; // both of these bitflags 
+  u8 EffectonHit2; // revisit these to enum the efx
+  u8 StatusDuration;
+  u8 EffectonTarget;
+  u8 HitlagDuration;
+  u8 Unkn7;
+  u8 Unkn8;
+  u8 Unkn9;
+  u8 KO;
+  u8 Unkn10;
+  u8 Unkn11;
+  u8 Unkn12;  
+}[[name(PLMMotValStr[std::core::array_index()])]];
+
+// --------------------------------------------------------------------------------------
+
 // Output 
+
 emChunk MonChunk[90] @ 0x09BB3C20[[name("Monster Chunk")]];
+VeggieTradeTable VeggieElderTrades @ 0x09BD2E58[[name("Veggie Elder Trades")]];
+PLMHitboxTable MeleeHitBoxes[20] @ 0x09BF7118[[name("Player Melee Hitboxes")]];
+PlayerMotVal PLMotVal[109] @ 0x09BF7168[[name("Player Melee Motion Values")]];
