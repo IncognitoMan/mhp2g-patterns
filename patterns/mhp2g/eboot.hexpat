@@ -193,11 +193,11 @@ struct ArmorValue <auto ArmorType> {
 )]];
 
 struct ArmorValuePTR {
+  ArmorValue<0> *LegArmorValues[420] : u32 [[name("Leg Armor Values")]];
   ArmorValue<1> *HeadArmorValues[436] : u32 [[name("Head Armor Values")]];
   ArmorValue<2> *ChestArmorValues[420] : u32 [[name("Chest Armor Values")]];
   ArmorValue<3> *ArmArmorValues[411] : u32 [[name("Arm Armor Values")]];
   ArmorValue<4> *WaistArmorValues[409] : u32 [[name("Waist Armor Values")]];
-  ArmorValue<0> *LegArmorValues[420] : u32 [[name("Leg Armor Values")]];
 };
 
 // --------------------------------------------------------------------------------------
@@ -532,4 +532,4 @@ BGModTable BowgunMods @ 0x08976944[[name("Bowgun Mod Table")]];
 WepValueDualAttr WepDualAttr[15] @ 0x08976C54[[name("Dual Attribute Weapons")]];
 
 // Decoration Values
-DecoValues DecorationValues[169] @ 0x0899FB18[[name("Decoration Values")]];
+DecoValues DecorationValues[168] @ 0x0899FB18[[name("Decoration Values")]];
