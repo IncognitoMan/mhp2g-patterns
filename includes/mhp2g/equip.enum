@@ -1,6 +1,6 @@
 // Headgear
 str HeadArmorID[437] = {
-  "Nothing equipped.",
+  "－－－－－－",
   "Leather Helm",
   "Chain Helm",
   "Hunter's Helm",
@@ -440,7 +440,7 @@ str HeadArmorID[437] = {
 
 // Body
 str ChestArmorID[435] = {
-  "Nothing equipped.",
+  "－－－－－－",
   "Leather Armor",
   "Chain Mail",
   "Hunter's Mail",
@@ -864,7 +864,7 @@ str ChestArmorID[435] = {
 
 // Arms
 str ArmArmorID[412] = {
-  "Nothing equipped.",
+  "－－－－－－",
   "Leather Vambraces",
   "Chain Vambraces",
   "Hunter's Vambraces",
@@ -1279,7 +1279,7 @@ str ArmArmorID[412] = {
 
 // Waist
 str WaistArmorID[410] = {
-  "Nothing equipped.",
+  "－－－－－－",
   "Leather Belt",
   "Light Belt",
   "Chain Belt",
@@ -1692,7 +1692,7 @@ str WaistArmorID[410] = {
 
 // Legs
 str LegArmorID[421] = {
-  "Nothing equipped.",
+  "－－－－－－",
   "Green Pants",
   "Blue Pants",
   "Hunter's Greaves",
@@ -2116,7 +2116,7 @@ str LegArmorID[421] = {
 
 // Blademaster Weapons
 str WepBMID[1151] = {
-  "Nothing equipped.",
+  "－－－－－－",
   "Carbalite Sword",
   "Carbalite Sword+",
   "Buster Sword",
@@ -3270,7 +3270,7 @@ str WepBMID[1151] = {
 
 // Gunner Weapons
 str WepGunID[355] = {
-  "Nothing equipped.",
+  "－－－－－－",
   "Shooter's Barrel",
   "Chain Blitz",
   "Shotgun (White)",

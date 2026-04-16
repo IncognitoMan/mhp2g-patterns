@@ -241,9 +241,10 @@ bitfield ShotCoat {
 
 // Element type bitflag for weapons with multiple elements
 enum EleBitFlag : u16 {
+  Sleep = 1,
   Poison = 2,
   Paralysis = 4,
-  Sleep = 8, // Unsure about this one... TODO: check
+  Unused = 8,
   Fire = 16,
   Water = 32,
   Thunder = 64,
